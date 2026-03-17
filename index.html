@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>User API</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Sora', 'sans-serif'],
+            mono: ['DM Mono', 'monospace'],
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    body { font-family: 'Sora', sans-serif; }
+    .tab-panel { display: none; }
+    .tab-panel.active { display: block; }
+    .method-badge { font-family: 'DM Mono', monospace; }
+  </style>
+</head>
+<body class="bg-zinc-950 text-zinc-100 min-h-screen">
+
+  <!-- Navbar -->
+  <header class="border-b border-zinc-800 px-8 py-4 flex items-center justify-between">
+    <div class="flex items-center gap-3">
+      <div class="w-2 h-2 rounded-full bg-emerald-400"></div>
+      <span class="font-mono text-sm text-zinc-400">user-api</span>
+      <span class="text-zinc-700">/</span>
+      <span class="font-mono text-sm text-zinc-500">v1.0.0</span>
+    </div>
+    <div class="flex items-center gap-2">
+      <span class="text-xs text-zinc-500 font-mono" id="base-url-display">localhost:3000</span>
+      <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 inline-block"></span>
+    </div>
+  </header>
+
+  <div class="max-w-5xl mx-auto px-6 py-10 grid grid-cols-3 gap-8">
+
+    <!-- Sidebar endpoints -->
+    <aside class="col-span-1">
+      <p class="text-xs font-mono text-zinc-500 uppercase tracking-widest mb-4">Endpoints</p>
+      <nav class="flex flex-col gap-1">
+        <button onclick="selectEndpoint('get-all')" id="nav-get-all"
+          class="nav-btn text-left px-3 py-2.5 rounded-lg flex items-center gap-3 bg-zinc-800 border border-zinc-700">
+          <span class="method-badge text-xs font-medium text-emerald-400 w-10">GET</span>
+          <span class="text-sm text-zinc-200">/api/users</span>
+        </button>
+        <button onclick="selectEndpoint('get-one')" id="nav-get-one"
+          class="nav-btn text-left px-3 py-2.5 rounded-lg flex items-center gap-3 hover:bg-zinc-800 border border-transparent hover:border-zinc-700">
+          <span class="method-badge text-xs font-medium text-emerald-400 w-10">GET</span>
+          <span class="text-sm text-zinc-400">/api/users/:id</span>
+        </button>
+        <button onclick="selectEndpoint('post')" id="nav-post"
+          class="nav-btn text-left px-3 py-2.5 rounded-lg flex items-center gap-3 hover:bg-zinc-800 border border-transparent hover:border-zinc-700">
+          <span class="method-badge text-xs font-medium text-blue-400 w-10">POST</span>
+          <span class="text-sm text-zinc-400">/api/users</span>
+        </button>
+        <button onclick="selectEndpoint('delete')" id="nav-delete"
+          class="nav-btn text-left px-3 py-2.5 rounded-lg flex items-center gap-3 hover:bg-zinc-800 border border-transparent hover:border-zinc-700">
+          <span class="method-badge text-xs font-medium text-red-400 w-10">DEL</span>
+          <span class="text-sm text-zinc-400">/api/users/:id</span>
+        </button>
+      </nav>
+
+      <!-- Config -->
+      <div class="mt-8">
+        <p class="text-xs font-mono text-zinc-500 uppercase tracking-widest mb-3">Configuration</p>
+        <label class="text-xs text-zinc-500 block mb-1">Base URL</label>
+        <input id="base-url" type="text" value="http://localhost:3000"
+          class="w-full bg-zinc-900 border border-zinc-700 rounded-lg px-3 py-2 text-sm font-mono text-zinc-300 focus:outline-none focus:border-zinc-500"
+          oninput="document.getElementById('base-url-display').textContent = this.value.replace('http://','').replace('https://','')" />
+      </div>
+    </aside>
+
+    <!-- Main panel -->
+    <main class="col-span-2 flex flex-col gap-6">
+
+      <!-- GET ALL -->
+      <div id="panel-get-all" class="tab-panel active">
+        <div class="flex items-center gap-3 mb-6">
+          <span class="method-badge text-xs font-medium px-2.5 py-1 rounded bg-emerald-950 text-emerald-400 border border-emerald-800">GET</span>
+          <span class="font-mono text-sm text-zinc-300">/api/users</span>
+          <span class="text-xs text-zinc-600 ml-auto">Retourne tous les utilisateurs</span>
+        </div>
+        <button onclick="getAllUsers()"
+          class="h-9 px-5 text-sm font-medium bg-zinc-100 text-zinc-900 rounded-lg hover:bg-white active:scale-95 transition-all">
+          Envoyer la requete
+        </button>
+      </div>
+
+      <!-- GET ONE -->
+      <div id="panel-get-one" class="tab-panel">
+        <div class="flex items-center gap-3 mb-6">
+          <span class="method-badge text-xs font-medium px-2.5 py-1 rounded bg-emerald-950 text-emerald-400 border border-emerald-800">GET</span>
+          <span class="font-mono text-sm text-zinc-300">/api/users/:id</span>
+          <span class="text-xs text-zinc-600 ml-auto">Retourne un utilisateur par ID</span>
+        </div>
+        <div class="mb-4">
+          <label class="text-xs text-zinc-500 block mb-1.5">ID utilisateur</label>
+          <input id="get-id" type="number" placeholder="1"
+            class="w-40 bg-zinc-900 border border-zinc-700 rounded-lg px-3 py-2 text-sm font-mono text-zinc-300 focus:outline-none focus:border-zinc-500" />
+        </div>
+        <button onclick="getUserById()"
+          class="h-9 px-5 text-sm font-medium bg-zinc-100 text-zinc-900 rounded-lg hover:bg-white active:scale-95 transition-all">
+          Envoyer la requete
+        </button>
+      </div>
+
+      <!-- POST -->
+      <div id="panel-post" class="tab-panel">
+        <div class="flex items-center gap-3 mb-6">
+          <span class="method-badge text-xs font-medium px-2.5 py-1 rounded bg-blue-950 text-blue-400 border border-blue-800">POST</span>
+          <span class="font-mono text-sm text-zinc-300">/api/users</span>
+          <span class="text-xs text-zinc-600 ml-auto">Crée un nouvel utilisateur</span>
+        </div>
+        <div class="flex flex-col gap-3 mb-4">
+          <div>
+            <label class="text-xs text-zinc-500 block mb-1.5">Nom</label>
+            <input id="post-name" type="text" placeholder="Charlie"
+              class="w-full bg-zinc-900 border border-zinc-700 rounded-lg px-3 py-2 text-sm text-zinc-300 focus:outline-none focus:border-zinc-500" />
+          </div>
+          <div>
+            <label class="text-xs text-zinc-500 block mb-1.5">Email</label>
+            <input id="post-email" type="email" placeholder="charlie@example.com"
+              class="w-full bg-zinc-900 border border-zinc-700 rounded-lg px-3 py-2 text-sm text-zinc-300 focus:outline-none focus:border-zinc-500" />
+          </div>
+        </div>
+        <button onclick="createUser()"
+          class="h-9 px-5 text-sm font-medium bg-zinc-100 text-zinc-900 rounded-lg hover:bg-white active:scale-95 transition-all">
+          Envoyer la requete
+        </button>
+      </div>
+
+      <!-- DELETE -->
+      <div id="panel-delete" class="tab-panel">
+        <div class="flex items-center gap-3 mb-6">
+          <span class="method-badge text-xs font-medium px-2.5 py-1 rounded bg-red-950 text-red-400 border border-red-800">DEL</span>
+          <span class="font-mono text-sm text-zinc-300">/api/users/:id</span>
+          <span class="text-xs text-zinc-600 ml-auto">Supprime un utilisateur</span>
+        </div>
+        <div class="mb-4">
+          <label class="text-xs text-zinc-500 block mb-1.5">ID utilisateur</label>
+          <input id="delete-id" type="number" placeholder="1"
+            class="w-40 bg-zinc-900 border border-zinc-700 rounded-lg px-3 py-2 text-sm font-mono text-zinc-300 focus:outline-none focus:border-zinc-500" />
+        </div>
+        <button onclick="deleteUser()"
+          class="h-9 px-5 text-sm font-medium bg-red-950 text-red-400 border border-red-800 rounded-lg hover:bg-red-900 active:scale-95 transition-all">
+          Envoyer la requete
+        </button>
+      </div>
+
+      <!-- Response panel -->
+      <div class="mt-2">
+        <div class="flex items-center justify-between mb-2">
+          <p class="text-xs font-mono text-zinc-500 uppercase tracking-widest">Reponse</p>
+          <div class="flex items-center gap-3">
+            <span id="resp-time" class="text-xs font-mono text-zinc-600"></span>
+            <span id="resp-status" class="text-xs font-mono px-2 py-0.5 rounded hidden"></span>
+          </div>
+        </div>
+        <div class="bg-zinc-900 border border-zinc-800 rounded-xl p-5 min-h-40 relative">
+          <pre id="response-box" class="text-sm font-mono text-zinc-400 whitespace-pre-wrap leading-relaxed">En attente d'une requete...</pre>
+          <button onclick="copyResponse()" id="copy-btn"
+            class="absolute top-3 right-3 text-xs font-mono text-zinc-600 hover:text-zinc-400 transition-colors hidden">
+            copier
+          </button>
+        </div>
+      </div>
+
+    </main>
+  </div>
+
+  <script>
+    const panels = ['get-all', 'get-one', 'post', 'delete'];
+
+    function selectEndpoint(name) {
+      panels.forEach(p => {
+        document.getElementById('panel-' + p).classList.remove('active');
+        const nav = document.getElementById('nav-' + p);
+        nav.classList.remove('bg-zinc-800', 'border-zinc-700');
+        nav.classList.add('border-transparent');
+        nav.querySelectorAll('span')[1].classList.replace('text-zinc-200', 'text-zinc-400');
+      });
+      document.getElementById('panel-' + name).classList.add('active');
+      const active = document.getElementById('nav-' + name);
+      active.classList.add('bg-zinc-800', 'border-zinc-700');
+      active.classList.remove('border-transparent');
+      active.querySelectorAll('span')[1].classList.replace('text-zinc-400', 'text-zinc-200');
+      clearResponse();
+    }
+
+    function baseUrl() {
+      return document.getElementById('base-url').value.replace(/\/$/, '');
+    }
+
+    function showResponse(data, status, ms) {
+      const box = document.getElementById('response-box');
+      const badge = document.getElementById('resp-status');
+      const time = document.getElementById('resp-time');
+      const copy = document.getElementById('copy-btn');
+
+      box.textContent = JSON.stringify(data, null, 2);
+      time.textContent = ms + 'ms';
+
+      badge.classList.remove('hidden', 'bg-emerald-950', 'text-emerald-400', 'border-emerald-800',
+        'bg-red-950', 'text-red-400', 'border-red-800', 'border');
+      badge.classList.add('border');
+
+      if (status >= 200 && status < 300) {
+        badge.classList.add('bg-emerald-950', 'text-emerald-400', 'border-emerald-800');
+        box.className = 'text-sm font-mono text-emerald-300 whitespace-pre-wrap leading-relaxed';
+      } else {
+        badge.classList.add('bg-red-950', 'text-red-400', 'border-red-800');
+        box.className = 'text-sm font-mono text-red-400 whitespace-pre-wrap leading-relaxed';
+      }
+
+      badge.textContent = status;
+      badge.classList.remove('hidden');
+      copy.classList.remove('hidden');
+    }
+
+    function showError(msg) {
+      const box = document.getElementById('response-box');
+      box.textContent = 'Erreur : ' + msg;
+      box.className = 'text-sm font-mono text-red-500 whitespace-pre-wrap leading-relaxed';
+    }
+
+    function clearResponse() {
+      const box = document.getElementById('response-box');
+      box.textContent = 'En attente d\'une requete...';
+      box.className = 'text-sm font-mono text-zinc-400 whitespace-pre-wrap leading-relaxed';
+      document.getElementById('resp-status').classList.add('hidden');
+      document.getElementById('resp-time').textContent = '';
+      document.getElementById('copy-btn').classList.add('hidden');
+    }
+
+    async function request(method, path, body = null) {
+      const start = Date.now();
+      try {
+        const opts = {
+          method,
+          headers: { 'Content-Type': 'application/json' }
+        };
+        if (body) opts.body = JSON.stringify(body);
+        const res = await fetch(baseUrl() + path, opts);
+        const ms = Date.now() - start;
+        const data = await res.json();
+        showResponse(data, res.status, ms);
+      } catch (e) {
+        showError(e.message);
+      }
+    }
+
+    function getAllUsers() {
+      request('GET', '/api/users');
+    }
+
+    function getUserById() {
+      const id = document.getElementById('get-id').value;
+      if (!id) { showError('ID requis'); return; }
+      request('GET', '/api/users/' + id);
+    }
+
+    function createUser() {
+      const name = document.getElementById('post-name').value.trim();
+      const email = document.getElementById('post-email').value.trim();
+      if (!name || !email) { showError('Nom et email requis'); return; }
+      request('POST', '/api/users', { name, email });
+    }
+
+    function deleteUser() {
+      const id = document.getElementById('delete-id').value;
+      if (!id) { showError('ID requis'); return; }
+      request('DELETE', '/api/users/' + id);
+    }
+
+    function copyResponse() {
+      const text = document.getElementById('response-box').textContent;
+      navigator.clipboard.writeText(text);
+      const btn = document.getElementById('copy-btn');
+      btn.textContent = 'copie !';
+      setTimeout(() => { btn.textContent = 'copier'; }, 1500);
+    }
+  </script>
+</body>
+</html>

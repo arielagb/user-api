@@ -1,6 +1,8 @@
 const express = require('express');
+const cors = require('cors');
 const app = express();
 
+app.use(cors());
 app.use(express.json());
 
 let users = [
@@ -37,4 +39,20 @@ app.post('/api/users', (req, res) => {
   res.status(201).json(newUser);
 });
 
+// DELETE user by ID
+app.delete('/api/users/:id', (req, res) => {
+  const index = users.findIndex(u => u.id === parseInt(req.params.id));
+  if (index === -1) {
+    return res.status(404).json({ error: 'User not found' });
+  }
+  const deleted = users.splice(index, 1)[0];
+  res.json(deleted);
+});
+
 module.exports = app;
+
+if (require.main === module) {
+  app.listen(3000, () => {
+    console.log('Server running on port 3000');
+  });
+}
