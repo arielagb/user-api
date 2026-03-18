@@ -6,7 +6,7 @@ npm install
 \```
 ## Tests
 \```bash
-npm test
+npm test 
 npm run test:coverage
 \```
 ## Linting
