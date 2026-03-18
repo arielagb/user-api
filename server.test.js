@@ -52,4 +52,15 @@ describe('User API', () => {
     const response = await request(app).get('/api/users/abc');
     expect(response.status).toBe(404);
   });
+
+  test('DELETE /api/users/:id should delete user', async () => {
+  const response = await request(app).delete('/api/users/1');
+  expect(response.status).toBe(200);
+  expect(response.body).toHaveProperty('id');
+});
+
+test('DELETE /api/users/:id should return 404', async () => {
+  const response = await request(app).delete('/api/users/999');
+  expect(response.status).toBe(404);
+});
 });
