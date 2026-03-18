@@ -39,4 +39,17 @@ describe('User API', () => {
     expect(response.status).toBe(400);
   });
 
+    // Test manquant : POST sans name
+  test('POST /api/users should return 400 without name', async () => {
+    const response = await request(app)
+      .post('/api/users')
+      .send({ email: 'test@test.com' });
+    expect(response.status).toBe(400);
+  });
+
+  // Test manquant : GET avec ID invalide
+  test('GET /api/users/:id with invalid id should return 404', async () => {
+    const response = await request(app).get('/api/users/abc');
+    expect(response.status).toBe(404);
+  });
 });
