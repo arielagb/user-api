@@ -78,8 +78,6 @@ describe('User API', () => {
     expect(response.status).toBe(400);
   });
 
-<<<<<<< HEAD
-=======
   test('DELETE /api/users/:id should delete user', async () => {
   const response = await request(app).delete('/api/users/1');
   expect(response.status).toBe(200);
@@ -90,5 +88,4 @@ test('DELETE /api/users/:id should return 404', async () => {
   const response = await request(app).delete('/api/users/999');
   expect(response.status).toBe(404);
 });
->>>>>>> 6fe6eb87cb52d4477a552500309b39c07eb6c6b4
 });
