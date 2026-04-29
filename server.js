@@ -1,6 +1,10 @@
 const express = require('express');
 const cors = require('cors');
 const app = express();
+const path = require('path');
+
+// Ajoute cette ligne pour servir index.html
+app.use(express.static(path.join(__dirname, '.')));
 
 app.use(cors());
 app.use(express.json());

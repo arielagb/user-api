@@ -11,6 +11,8 @@ RUN npm ci --only=production && npm cache clean --force
 
 COPY server.js .
 
+COPY index.html .   
+
 RUN addgroup -S appgroup && \
     adduser -S appuser -G appgroup && \
     chown -R appuser:appgroup /app
